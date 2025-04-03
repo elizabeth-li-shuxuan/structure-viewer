@@ -1,0 +1,35 @@
+<!--4/3/2025 Elizabeth Li-->
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Structure Viewer</title>
+    </head>
+    <body>
+        <h2>Upload a brain file (.obj or .vtp)</h2>
+
+        <form method="post" enctype="multipart/form-data">
+            <input type="file" name="file" accept=".obj">
+            <!-- Upload button-->
+             <button type="submit">Upload</button> 
+        </form>
+
+        <!--if a file has been uploaded, display the file name-->
+        {% if filename %}
+            <h3>Uploaded file: {{ filename }}</h3>
+
+        <!--vtk container-->
+        <div id="vtk-container"></div>
+        
+        <!--functionality for users to input their ratings-->
+        <div>
+            <input type="number" id="rating" min="1" max="10" placeholder="Rate 1-10">
+            <button onclick="submitRating('{{filename}}')">Submit rating</button>
+        </div>
+        {% endif %}
+
+        <!--link to external javascript file that handles client-side functionality-->
+        <script src="{{url_for('static', filename='js/main.js')}}"></script>
+    </body>
+</html>
