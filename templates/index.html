@@ -5,15 +5,26 @@
     <head>
         <meta charset="UTF-8">
         <title>Structure Viewer</title>
-        <script src="https://unpkg.com/vtk.js"></script>
+        <script src="https://unpkg.com/vtk.js@19.3.0"></script>
+        <style> /* Changed: Added style block for font, background and border */
+            body {
+                font-family: Arial, sans-serif; /* Changed: set font to Arial */
+                background-color: black; /* Changed: set background to black */
+                color: white;
+            }
+            #vtk-container {
+                width: 80%;
+                height: 600px;
+                border: 2px solid white; /* Changed: added white border */
+                margin-top: 20px; /* Changed: margin for vtk container */
+            }
+        </style>
     </head>
     <body>
         <h2>Upload a brain file (.obj or .vtp)</h2>
 
         <form method="post" enctype="multipart/form-data">
-            <input type="file" name="file" accept=".vtp">
-            <!-- Upload button-->
-             <button type="submit">Upload</button> 
+            <input type="file" name="file" accept=".vtp" id="fileInput">
         </form>
 
         <!--if a file has been uploaded, display the file name-->
@@ -25,7 +36,7 @@
                 <button onclick="submitRating('{{filename}}')">Submit rating</button>
             </div>
             <!--vtk container-->
-            <div id="vtk-container" style="width:80%; height:600px;"></div> <!-- Changed: set width to 80% and fixed height -->
+            <div id="vtk-container"></div> <!-- Changed: removed inline style since it's in CSS block -->
             
             <script>
                 window.filename="{{filename}}";

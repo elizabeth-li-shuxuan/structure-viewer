@@ -45,6 +45,12 @@ function initializeVTK(filename){
 
 //check if a file has been uploaded and initialize visualization
 document.addEventListener('DOMContentLoaded', () => {
+    const fileInput = document.getElementById('fileInput'); // Changed: added auto-submit file input event listener
+    if (fileInput) {
+        fileInput.addEventListener('change', function() {
+            this.form.submit();
+        });
+    }
     if (window.filename){
         initializeVTK(window.filename);
     }
