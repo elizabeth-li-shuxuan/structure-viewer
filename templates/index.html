@@ -5,23 +5,25 @@
     <head>
         <meta charset="UTF-8">
         <title>Structure Viewer</title>
-        <script src="https://unpkg.com/vtk.js@19.3.0"></script>
-        <style> /* Changed: Added style block for font, background and border */
+        <script src="https://unpkg.com/vtk.js"></script>
+        <style> 
             body {
-                font-family: Arial, sans-serif; /* Changed: set font to Arial */
-                background-color: black; /* Changed: set background to black */
+                font-family: Arial, sans-serif; 
+                background-color: black;
                 color: white;
             }
             #vtk-container {
                 width: 80%;
-                height: 600px;
-                border: 2px solid white; /* Changed: added white border */
-                margin-top: 20px; /* Changed: margin for vtk container */
+                min-height: 600px;
+                border: 2px solid white; /* white border around visualization box */
+                pointer-events: auto;
+                position: relative;
+                z-index: 1000;
             }
         </style>
     </head>
     <body>
-        <h2>Upload a brain file (.obj or .vtp)</h2>
+        <h2>Upload a brain file (.vtp)</h2>
 
         <form method="post" enctype="multipart/form-data">
             <input type="file" name="file" accept=".vtp" id="fileInput">
@@ -31,15 +33,22 @@
         {% if filename %}
             <h2>Uploaded file: {{ filename }}</h2>
             <!--functionality for users to input their ratings-->
-            <div style="margin-top:20px;"> <!-- Changed: moved rating container above vtk container -->
+            <div style="margin-top:20px;">
                 <input type="number" id="rating" min="1" max="10" placeholder="Rate 1-10">
                 <button onclick="submitRating('{{filename}}')">Submit rating</button>
             </div>
             <!--vtk container-->
-            <div id="vtk-container"></div> <!-- Changed: removed inline style since it's in CSS block -->
+            <div id="vtk-container"></div> 
             
             <script>
                 window.filename="{{filename}}";
+            </script>
+
+                <!-- Debugging: Check if the vtk-container is receiving mouse events -->
+            <script>
+                document.getElementById('vtk-container').addEventListener('click', () => {
+                    console.log("vtk-container clicked");
+                });
             </script>
         {% endif %}
 

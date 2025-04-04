@@ -1,7 +1,6 @@
 // 4/3/2025 Elizabeth Li
-// vtk with vtp files
+// visualize .vtp brain structure files with vtk, process user-inputted rating
 
-//initialize VTK.js visualization
 function initializeVTK(filename){
     const container = document.getElementById('vtk-container');
 
@@ -12,12 +11,31 @@ function initializeVTK(filename){
     const openglRenderWindow = vtk.Rendering.OpenGL.vtkRenderWindow.newInstance();
     openglRenderWindow.setContainer(container);
     renderWindow.addView(openglRenderWindow);
+    
+    //synchronize canvas size with container
+    const containerWidth = container.clientWidth;
+    const containerHeight = container.clientHeight;
+    openglRenderWindow.setSize(containerWidth, containerHeight);
 
     //interactor for user interactions
     const interactor = vtk.Rendering.Core.vtkRenderWindowInteractor.newInstance();
-    interactor.setView(openglRenderWindow)
+    interactor.setView(openglRenderWindow);
     interactor.initialize();
-    interactor.bindEvents(container)
+
+    // set a trackball-style interactor
+    const interactorStyle = vtk.Interaction.Style.vtkInteractorStyleTrackballCamera.newInstance();
+    interactor.setInteractorStyle(interactorStyle)
+
+    interactor.bindEvents(container);
+    interactor.start();
+
+    // update canvas size on window resize
+    window.addEventListener('resize', () => {
+        const newWidth = container.clientWidth; // Get updated container width on resize
+        const newHeight = container.clientHeight; // Get updated container height on resize
+        openglRenderWindow.setSize(newWidth, newHeight); // Update canvas size accordingly
+        renderWindow.render(); // Re-render the scene with new dimensions
+    });
 
     //create a VTP reader instance
     const reader = vtk.IO.XML.vtkXMLPolyDataReader.newInstance();
@@ -42,10 +60,9 @@ function initializeVTK(filename){
         .catch(error => console.error('Error loading VTP file:', error));
 }
 
-
 //check if a file has been uploaded and initialize visualization
 document.addEventListener('DOMContentLoaded', () => {
-    const fileInput = document.getElementById('fileInput'); // Changed: added auto-submit file input event listener
+    const fileInput = document.getElementById('fileInput');
     if (fileInput) {
         fileInput.addEventListener('change', function() {
             this.form.submit();
