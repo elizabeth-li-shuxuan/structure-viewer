@@ -24,7 +24,7 @@ def upload_file():
     return render_template('index.html')
 
 #route to serve uploaded files to the client
-@app.route('/rate', methods=['POST'])
+@app.route('/uploads/<filename>')
 def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 

@@ -5,28 +5,31 @@
     <head>
         <meta charset="UTF-8">
         <title>Structure Viewer</title>
+        <script src="https://unpkg.com/vtk.js"></script>
     </head>
     <body>
         <h2>Upload a brain file (.obj or .vtp)</h2>
 
         <form method="post" enctype="multipart/form-data">
-            <input type="file" name="file" accept=".obj">
+            <input type="file" name="file" accept=".vtp">
             <!-- Upload button-->
              <button type="submit">Upload</button> 
         </form>
 
         <!--if a file has been uploaded, display the file name-->
         {% if filename %}
-            <h3>Uploaded file: {{ filename }}</h3>
-
-        <!--vtk container-->
-        <div id="vtk-container"></div>
-        
-        <!--functionality for users to input their ratings-->
-        <div>
-            <input type="number" id="rating" min="1" max="10" placeholder="Rate 1-10">
-            <button onclick="submitRating('{{filename}}')">Submit rating</button>
-        </div>
+            <h2>Uploaded file: {{ filename }}</h2>
+            <!--functionality for users to input their ratings-->
+            <div style="margin-top:20px;"> <!-- Changed: moved rating container above vtk container -->
+                <input type="number" id="rating" min="1" max="10" placeholder="Rate 1-10">
+                <button onclick="submitRating('{{filename}}')">Submit rating</button>
+            </div>
+            <!--vtk container-->
+            <div id="vtk-container" style="width:80%; height:600px;"></div> <!-- Changed: set width to 80% and fixed height -->
+            
+            <script>
+                window.filename="{{filename}}";
+            </script>
         {% endif %}
 
         <!--link to external javascript file that handles client-side functionality-->

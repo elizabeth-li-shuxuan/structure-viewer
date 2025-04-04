@@ -1,6 +1,56 @@
-//4/3/2025 Elizabeth Li
-//submit a user-inputted rating for a given file to the server
+// 4/3/2025 Elizabeth Li
+// vtk with vtp files
 
+//initialize VTK.js visualization
+function initializeVTK(filename){
+    const container = document.getElementById('vtk-container');
+
+    //render window
+    const renderWindow = vtk.Rendering.Core.vtkRenderWindow.newInstance();
+    const renderer = vtk.Rendering.Core.vtkRenderer.newInstance();
+    renderWindow.addRenderer(renderer);
+    const openglRenderWindow = vtk.Rendering.OpenGL.vtkRenderWindow.newInstance();
+    openglRenderWindow.setContainer(container);
+    renderWindow.addView(openglRenderWindow);
+
+    //interactor for user interactions
+    const interactor = vtk.Rendering.Core.vtkRenderWindowInteractor.newInstance();
+    interactor.setView(openglRenderWindow)
+    interactor.initialize();
+    interactor.bindEvents(container)
+
+    //create a VTP reader instance
+    const reader = vtk.IO.XML.vtkXMLPolyDataReader.newInstance();
+
+    //fetch VTP file from server
+    fetch(`/uploads/${filename}`)
+        .then(response => response.arrayBuffer())
+        .then(data => {
+            reader.parseAsArrayBuffer(data);
+
+            //create mapper and actor
+            const mapper = vtk.Rendering.Core.vtkMapper.newInstance();
+            mapper.setInputConnection(reader.getOutputPort());
+            const actor = vtk.Rendering.Core.vtkActor.newInstance();
+            actor.setMapper(mapper);
+
+            //render the scene
+            renderer.addActor(actor);
+            renderer.resetCamera();
+            renderWindow.render();
+        })
+        .catch(error => console.error('Error loading VTP file:', error));
+}
+
+
+//check if a file has been uploaded and initialize visualization
+document.addEventListener('DOMContentLoaded', () => {
+    if (window.filename){
+        initializeVTK(window.filename);
+    }
+});
+
+//submit a user-inputted rating for a given file to the server
 function submitRating(filename){
     const rating = document.getElementById('rating').value;
 
@@ -9,11 +59,10 @@ function submitRating(filename){
         headers: {'Content-Type':'application/json'},
         body: JSON.stringify({filename: filename, rating: rating})
     })
-
     .then(response => response.json())
-
     .then(data => {
         alert('Rating submitted successfully');
         console.log(data);
-    });
+    })
+    .catch(error => console.error('Error submitting rating:', error));
 }
