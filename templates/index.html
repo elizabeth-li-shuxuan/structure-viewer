@@ -11,11 +11,32 @@
                 font-family: Arial, sans-serif; 
                 background-color: black;
                 color: white;
+                margin: 20px 20px 0 20px; /* top, right, bottom, left margin */
+                display: flex;
+                flex-direction: column;
+                height: 100vh;
             }
+
+            .main-container {
+                display: flex;
+                flex-direction: row;
+                justify-content: space-between;
+                flex: 1;
+            }
+
+            /* text on top left */
+            .text-section {
+                width: 28%;
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-start;
+            }
+
+            /* vtk container as a square on the top right*/
             #vtk-container {
-                width: 80%;
-                min-height: 600px;
-                border: 2px solid white; /* white border around visualization box */
+                width: 80vh;
+                height: 80vh;
+                border: 2px solid white;
                 pointer-events: auto;
                 position: relative;
                 z-index: 1000;
@@ -23,34 +44,36 @@
         </style>
     </head>
     <body>
-        <h2>Upload a brain file (.vtp)</h2>
 
-        <form method="post" enctype="multipart/form-data">
-            <input type="file" name="file" accept=".vtp" id="fileInput">
-        </form>
+        <div class="main-container">
+            <!--text section on top left-->
+            <div class="text-section">
+                <h2>Upload a brain file (.vtp)</h2>
 
-        <!--if a file has been uploaded, display the file name-->
-        {% if filename %}
-            <h2>Uploaded file: {{ filename }}</h2>
-            <!--functionality for users to input their ratings-->
-            <div style="margin-top:20px;">
-                <input type="number" id="rating" min="1" max="10" placeholder="Rate 1-10">
-                <button onclick="submitRating('{{filename}}')">Submit rating</button>
+                <form method="post" enctype="multipart/form-data">
+                    <input type="file" name="file" accept=".vtp" id="fileInput">
+                </form>
+
+                <!--if a file has been uploaded, display the file name-->
+                {% if filename %}
+                    <h2>Uploaded file: {{ filename }}</h2>
+                    <!--functionality for users to input their ratings-->
+                    <div style="margin-top:20px;">
+                        <input type="number" id="rating" min="1" max="10" placeholder="Rate 1-10">
+                        <button onclick="submitRating('{{filename}}')">Submit rating</button>
+                    </div>
+
+                    <script>
+                        window.filename="{{filename}}";
+                    </script>
+                {% endif %}
             </div>
-            <!--vtk container-->
-            <div id="vtk-container"></div> 
-            
-            <script>
-                window.filename="{{filename}}";
-            </script>
 
-                <!-- Debugging: Check if the vtk-container is receiving mouse events -->
-            <script>
-                document.getElementById('vtk-container').addEventListener('click', () => {
-                    console.log("vtk-container clicked");
-                });
-            </script>
-        {% endif %}
+            <!--vtk container on right-->
+            {% if filename %}
+            <div id="vtk-container"></div> 
+            {% endif %}
+        </div>
 
         <!--link to external javascript file that handles client-side functionality-->
         <script src="{{url_for('static', filename='js/main.js')}}"></script>
