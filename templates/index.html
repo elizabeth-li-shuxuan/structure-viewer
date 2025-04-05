@@ -40,6 +40,9 @@
                 pointer-events: auto;
                 position: relative;
                 z-index: 1000;
+                display: flex;
+                align-items: center;
+                justify-content: center;
             }
         </style>
     </head>
@@ -54,13 +57,17 @@
                     <input type="file" name="file" accept=".vtp" id="fileInput">
                 </form>
 
-                <!--if a file has been uploaded, display the file name-->
+                <!--if a file has been uploaded, display the file name and rating options-->
                 {% if filename %}
                     <h2>Uploaded file: {{ filename }}</h2>
                     <!--functionality for users to input their ratings-->
                     <div style="margin-top:20px;">
-                        <input type="number" id="rating" min="1" max="10" placeholder="Rate 1-10">
-                        <button onclick="submitRating('{{filename}}')">Submit rating</button>
+                        <p>Please rate:</p>
+                        <p>Press 1 for Yes, 2 for Maybe, 3 for No</p>
+                        <!--fallback buttons-->
+                        <button onclick="submitRating('{{filename}}', 1)">1</button>
+                        <button onclick="submitRating('{{filename}}', 2)">2</button>
+                        <button onclick="submitRating('{{filename}}', 3)">3</button>
                     </div>
 
                     <script>
@@ -70,12 +77,14 @@
             </div>
 
             <!--vtk container on right-->
-            {% if filename %}
-            <div id="vtk-container"></div> 
-            {% endif %}
+            <div id="vtk-container">
+                {% if not filename %}
+                    <p style="color: white">No file uploaded</p>
+                {% endif %}
+            </div>
         </div>
 
-        <!--link to external javascript file that handles client-side functionality-->
+        <!--link main.js that handles client-side functionality-->
         <script src="{{url_for('static', filename='js/main.js')}}"></script>
     </body>
 </html>

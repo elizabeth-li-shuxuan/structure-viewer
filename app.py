@@ -3,7 +3,9 @@
 
 from flask import Flask, request, render_template, send_from_directory, jsonify
 import os
+import csv
 from werkzeug.utils import secure_filename
+from datetime import datetime
 
 app = Flask(__name__)
 UPLOAD_FOLDER = 'uploads'
@@ -23,19 +25,25 @@ def upload_file():
             return render_template('index.html', filename=filename)
     return render_template('index.html')
 
-#route to serve uploaded files to the client
+# Route to serve uploaded files to the client
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
-#handle rating submissions
+# Handle rating submissions
 @app.route('/rate', methods=['POST'])
 def rate_file():
     data = request.json
     filename = data.get('filename')
     rating = data.get('rating')
     
-    #print received rating to console
+    # Record the rating to a CSV file with a timestamp
+    timestamp = datetime.now().isoformat()
+    entry = [timestamp, filename, rating]
+    with open('ratings.csv', 'a', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(entry)
+    
     print(f"Rating received: {filename} rated {rating}")
     return jsonify(status="success")
 

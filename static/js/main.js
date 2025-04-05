@@ -4,7 +4,7 @@
 function initializeVTK(filename){
     const container = document.getElementById('vtk-container');
 
-    //render window
+    // Render window
     const renderWindow = vtk.Rendering.Core.vtkRenderWindow.newInstance();
     const renderer = vtk.Rendering.Core.vtkRenderer.newInstance();
     renderWindow.addRenderer(renderer);
@@ -12,47 +12,47 @@ function initializeVTK(filename){
     openglRenderWindow.setContainer(container);
     renderWindow.addView(openglRenderWindow);
     
-    //synchronize canvas size with container
+    // Synchronize canvas size with container
     const containerWidth = container.clientWidth;
     const containerHeight = container.clientHeight;
     openglRenderWindow.setSize(containerWidth, containerHeight);
 
-    //interactor for user interactions
+    // Interactor for user interactions
     const interactor = vtk.Rendering.Core.vtkRenderWindowInteractor.newInstance();
     interactor.setView(openglRenderWindow);
     interactor.initialize();
 
-    // set a trackball-style interactor
+    // Set a trackball-style interactor
     const interactorStyle = vtk.Interaction.Style.vtkInteractorStyleTrackballCamera.newInstance();
-    interactor.setInteractorStyle(interactorStyle)
+    interactor.setInteractorStyle(interactorStyle);
 
     interactor.bindEvents(container);
     interactor.start();
 
-    // update canvas size on window resize
+    // Update canvas size on window resize
     window.addEventListener('resize', () => {
-        const newWidth = container.clientWidth; // Get updated container width on resize
-        const newHeight = container.clientHeight; // Get updated container height on resize
-        openglRenderWindow.setSize(newWidth, newHeight); // Update canvas size accordingly
-        renderWindow.render(); // Re-render the scene with new dimensions
+        const newWidth = container.clientWidth;
+        const newHeight = container.clientHeight;
+        openglRenderWindow.setSize(newWidth, newHeight);
+        renderWindow.render();
     });
 
-    //create a VTP reader instance
+    // Create a VTP reader instance
     const reader = vtk.IO.XML.vtkXMLPolyDataReader.newInstance();
 
-    //fetch VTP file from server
+    // Fetch VTP file from server
     fetch(`/uploads/${filename}`)
         .then(response => response.arrayBuffer())
         .then(data => {
             reader.parseAsArrayBuffer(data);
 
-            //create mapper and actor
+            // Create mapper and actor
             const mapper = vtk.Rendering.Core.vtkMapper.newInstance();
             mapper.setInputConnection(reader.getOutputPort());
             const actor = vtk.Rendering.Core.vtkActor.newInstance();
             actor.setMapper(mapper);
 
-            //render the scene
+            // Render the scene
             renderer.addActor(actor);
             renderer.resetCamera();
             renderWindow.render();
@@ -60,7 +60,7 @@ function initializeVTK(filename){
         .catch(error => console.error('Error loading VTP file:', error));
 }
 
-//check if a file has been uploaded and initialize visualization
+// Check if a file has been uploaded and initialize visualization
 document.addEventListener('DOMContentLoaded', () => {
     const fileInput = document.getElementById('fileInput');
     if (fileInput) {
@@ -73,10 +73,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-//submit a user-inputted rating for a given file to the server
-function submitRating(filename){
-    const rating = document.getElementById('rating').value;
 
+// Submit a user-inputted rating for a given file to the server
+// Now accepts both filename and rating as arguments
+function submitRating(filename, rating){
     fetch('/rate', {
         method: 'POST',
         headers: {'Content-Type':'application/json'},
@@ -89,3 +89,13 @@ function submitRating(filename){
     })
     .catch(error => console.error('Error submitting rating:', error));
 }
+
+
+// Listen for key presses (1, 2, 3) for primary rating submission
+document.addEventListener('keydown', function(event) {
+    // Only handle keys if a file has been uploaded
+    if (!window.filename) return;
+    if (event.key === '1' || event.key === '2' || event.key === '3') {
+        submitRating(window.filename, parseInt(event.key));
+    }
+});
