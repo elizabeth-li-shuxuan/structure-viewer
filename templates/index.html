@@ -60,7 +60,7 @@
 
                 <!--if a file has been uploaded, display the file name and rating options-->
                 {% if filename %}
-                    <h2>Uploaded file: {{ filename }}</h2>
+                    <h2 id="uploadedFilename">Uploaded file: {{ filename }}</h2>
                     <!--functionality for users to input their ratings-->
                     <div style="margin-top:20px;">
                         <p>Please rate:</p>
@@ -70,6 +70,9 @@
                         <button onclick="submitRating('{{filename}}', 2)">2</button>
                         <button onclick="submitRating('{{filename}}', 3)">3</button>
                     </div>
+                    <!-- inline notification for when user successfully submits rating -->
+                    <div id="notification" style="display: none; color: lightgreen; margin-top: 10px;"></div>
+
 
                     <script>
                         window.filename="{{filename}}";

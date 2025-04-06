@@ -105,6 +105,8 @@ function initializeVTK(filename){
         .catch(error => console.error('Error loading VTP file:', error));
 }
 
+
+
 // Check if a file has been uploaded and initialize visualization
 document.addEventListener('DOMContentLoaded', () => {
     const fileInput = document.getElementById('fileInput');
@@ -118,6 +120,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+
+
 // Submit a user-inputted rating for a given file to the server
 // Now accepts both filename and rating as arguments
 function submitRating(filename, rating){
@@ -128,23 +132,43 @@ function submitRating(filename, rating){
     })
     .then(response => response.json())
     .then(data => {
-        alert('Rating submitted successfully');
+        // Display inline notification for rating success
+        const notification = document.getElementById('notification');
+        if (notification) {
+            notification.innerText = 'Rating submitted successfully';
+            notification.style.display = 'block';
+            
+            // Hide notification after 0.5 seconds
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 500);
+        }
         console.log(data);
+        
         // After a rating is submitted, if a folder was uploaded, advance to the next file.
         if (window.filenames && window.currentFileIndex < window.filenames.length - 1) {
             window.currentFileIndex++;
             window.filename = window.filenames[window.currentFileIndex];
-            // Optionally update the text display with the new filename here.
+            
+            // Dynamically update the displayed filename on the webpage
+            const filenameElement = document.getElementById('uploadedFilename');
+            if (filenameElement) {
+                filenameElement.innerText = "Uploaded file: " + window.filename;
+            }
+
             // Clear the VTK container and reinitialize with the next file.
             const container = document.getElementById('vtk-container');
             container.innerHTML = "";  // Clear the container
             initializeVTK(window.filename);
-            } else {
+        } else {
+            // Pop up an alert when all files have been rated
             alert("All files have been rated.");
-            }
+        }
     })
     .catch(error => console.error('Error submitting rating:', error));
 }
+
+
 
 // Listen for key presses (1, 2, 3) for primary rating submission
 document.addEventListener('keydown', function(event) {
