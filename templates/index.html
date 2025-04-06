@@ -54,7 +54,8 @@
                 <h2>Upload a brain file (.vtp)</h2>
 
                 <form method="post" enctype="multipart/form-data">
-                    <input type="file" name="file" accept=".vtp" id="fileInput">
+                    <!-- Allow users to select folders or multiple files at once -->
+                    <input type="file" name="file" accept=".vtp" id="fileInput" multiple webkitdirectory>
                 </form>
 
                 <!--if a file has been uploaded, display the file name and rating options-->
@@ -83,6 +84,15 @@
                 {% endif %}
             </div>
         </div>
+        
+        <!-- if multiple files, output the variables -->
+        {% if filenames %}
+        <script>
+            window.filenames = {{ filenames|tojson|safe }}; // ignore the warning; this is a Jinja template
+            window.currentFileIndex = 0;
+            window.filename = window.filenames[0];
+        </script>
+        {% endif %}
 
         <!--link main.js that handles client-side functionality-->
         <script src="{{url_for('static', filename='js/main.js')}}"></script>

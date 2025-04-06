@@ -16,13 +16,19 @@ def upload_file():
     if request.method == 'POST':
         if 'file' not in request.files:
             return 'No file part', 400
-        file = request.files['file']
-        if file.filename == '':
+        files = request.files.getlist('file')
+        if not files or all(file.filename == '' for file in files):
             return 'No selected file', 400
-        if file:
-            filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            return render_template('index.html', filename=filename)
+
+        filenames = []
+        for file in files:
+            if file.filename != '':
+                filename = secure_filename(file.filename)
+                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                filenames.append(filename)
+                
+        # Use the first file for initial display and pass the full list.
+        return render_template('index.html', filename=filenames[0], filenames=filenames)
     return render_template('index.html')
 
 # Route to serve uploaded files to the client

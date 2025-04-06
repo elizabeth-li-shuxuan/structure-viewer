@@ -78,7 +78,7 @@ function initializeVTK(filename){
             renderer.resetCameraClippingRange();
             renderWindow.render();
 
-            // rotate on hover instead of click:
+            // custom code for brain to rotate on hover instead of click:
             container.addEventListener('mousemove', function(e) {
                 if (!actor) return;
                 // Get container's bounding rectangle
@@ -130,6 +130,26 @@ function submitRating(filename, rating){
     .then(data => {
         alert('Rating submitted successfully');
         console.log(data);
+        // After a rating is submitted, if a folder was uploaded, advance to the next file.
+        if (window.filenames && window.currentFileIndex < window.filenames.length - 1) {
+            window.currentFileIndex++;
+            window.filename = window.filenames[window.currentFileIndex];
+            // Optionally update the text display with the new filename here.
+            // Clear the VTK container and reinitialize with the next file.
+            const container = document.getElementById('vtk-container');
+            container.innerHTML = "";  // Clear the container
+            initializeVTK(window.filename);
+            } else {
+            alert("All files have been rated.");
+            }
     })
     .catch(error => console.error('Error submitting rating:', error));
 }
+
+// Listen for key presses (1, 2, 3) for primary rating submission
+document.addEventListener('keydown', function(event) {
+    if (!window.filename) return;
+    if (event.key === '1' || event.key === '2' || event.key === '3') {
+    submitRating(window.filename, parseInt(event.key));
+    }
+});
