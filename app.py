@@ -31,10 +31,12 @@ def upload_file():
         return render_template('index.html', filename=filenames[0], filenames=filenames)
     return render_template('index.html')
 
+
 # Route to serve uploaded files to the client
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
 
 # Handle rating submissions
 @app.route('/rate', methods=['POST'])
@@ -55,3 +57,38 @@ def rate_file():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+
+#Route to deleting the last rating for a file
+@app.route('/delete_rating', methods=['POST'])
+def delete_rating():
+    data = request.json
+    filename = data.get('filename')
+    try:
+        #if no rating file exists, there's nothing to delete
+        if not os.path.exists('ratings.csv')  :
+            return jsonify(status="no_ratings")    
+
+        # in ratings.csv, find and remove the most recent rating entry for the given filename
+        with open('ratings.csv', 'r', newline='') as csvfile:
+            reader = list(csv.reader(csvfile))
+        
+        index_to_remove = None
+        for i in range(len(reader)-1, -1, -1): #iterate backwards over indices of the 'reader' list
+            if reader[i][1] == filename:
+                index_to_remove = i
+                break
+
+        if index_to_remove is not None:
+            del reader[index_to_remove]
+            with open('ratings.csv','w',newline='') as csvfile:
+                writer = csv.writer(csvfile)
+                writer.writerows(reader)
+            print(f"Deleted rating for {filename}")
+            return jsonify(status="deleted")
+        else:
+            return jsonify(status="not_found")
+        
+    except Exception as e:
+        print(f"Error deleting rating: {e}")
+        return jsonify(status='error', message=str(e)), 500

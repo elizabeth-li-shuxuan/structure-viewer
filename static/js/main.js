@@ -178,10 +178,49 @@ function submitRating(filename, rating){
     .catch(error => console.error('Error submitting rating:', error));
 }
 
-// Listen for key presses (1, 2, 3) for primary rating submission
+// Function to go back to the previous file
+function goBack(){
+    if (window.filenames && window.currentFileIndex > 0){
+        let targetFilename = window.filenames[window.currentFileIndex -1];
+
+        fetch('/delete_rating', {
+            method: 'POST',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({filename: targetFilename})
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log("Rating deleted for " + targetFilename, data);
+            window.currentFileIndex--;
+            window.filename = window.filenames[window.currentFileIndex];
+
+            // Update displayed filename
+            const filenameElement = document.getElementById('uploadedFilename');
+            if (filenameElement){
+                filenameElement.innerHTML = "Uploaded file: " + window.filename + "<br><span id='progress' style='font-size: 14px; color: white; font-weight: normal;'></span>";
+            }
+
+            updateProgress();
+
+            // clear vtk container, reinitialize with previous file
+            const container = document.getElementById('vtk-container');
+            container.innerHTML = "";
+            initializeVTK(window.filename);
+        })
+        .catch(error => console.error('Error deleting rating:', error));
+
+    } else {
+        alert("You are already at the first file.");
+    }
+}
+
+// Listen for key presses
 document.addEventListener('keydown', function(event) {
     if (!window.filename) return;
     if (event.key === '1' || event.key === '2' || event.key === '3') {
         submitRating(window.filename, parseInt(event.key));
+    }
+    if (event.key === 'b' || event.key === 'B'){
+        goBack();
     }
 });

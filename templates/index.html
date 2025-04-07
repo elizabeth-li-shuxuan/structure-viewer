@@ -64,11 +64,12 @@
                     
                     <div style="margin-top:20px;">
                         <p>Please rate:</p>
-                        <p>Press 1 for Yes, 2 for Maybe, 3 for No</p>
+                        <p>Press 1 for Yes, 2 for Maybe, 3 for No, or b for back</p>
                         <!-- Fallback buttons -->
-                        <button onclick="submitRating('{{filename}}', 1)">1</button>
-                        <button onclick="submitRating('{{filename}}', 2)">2</button>
-                        <button onclick="submitRating('{{filename}}', 3)">3</button>
+                        <button onclick="submitRating('{{filename}}', 1)">Yes</button>
+                        <button onclick="submitRating('{{filename}}', 2)">Maybe</button>
+                        <button onclick="submitRating('{{filename}}', 3)">No</button>
+                        <button onclick="goBack()">Back</button>
                     </div>
                     <!-- Inline notification area -->
                     <div id="notification" style="display: none; color: lightgreen; margin-top: 10px;"></div>
