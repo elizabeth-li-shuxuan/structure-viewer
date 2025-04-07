@@ -51,7 +51,7 @@
         <div class="main-container">
             <!--text section on top left-->
             <div class="text-section">
-                <h2>Upload a brain file (.vtp)</h2>
+                <div> Upload a brain file (.vtp)</div>
 
                 <form method="post" enctype="multipart/form-data">
                     <!-- Allow users to select folders or multiple files at once -->
@@ -60,24 +60,34 @@
 
                 <!--if a file has been uploaded, display the file name and rating options-->
                 {% if filename %}
-                    <h2 id="uploadedFilename">Uploaded file: {{ filename }}</h2>
-                    <!--functionality for users to input their ratings-->
+                    <h2 id="uploadedFilename">Uploaded file: {{ filename }}</h2>             
+                    
                     <div style="margin-top:20px;">
                         <p>Please rate:</p>
                         <p>Press 1 for Yes, 2 for Maybe, 3 for No</p>
-                        <!--fallback buttons-->
+                        <!-- Fallback buttons -->
                         <button onclick="submitRating('{{filename}}', 1)">1</button>
                         <button onclick="submitRating('{{filename}}', 2)">2</button>
                         <button onclick="submitRating('{{filename}}', 3)">3</button>
                     </div>
-                    <!-- inline notification for when user successfully submits rating -->
+                    <!-- Inline notification area -->
                     <div id="notification" style="display: none; color: lightgreen; margin-top: 10px;"></div>
 
-
                     <script>
-                        window.filename="{{filename}}";
+                        window.filename = "{{filename}}";
+                        {% if filenames %}
+                            window.filenames = {{ filenames|tojson|safe }};
+                            window.currentFileIndex = 0;
+                        {% else %}
+                            // For a singular file, mimic a list with one file.
+                            window.filenames = [window.filename];
+                            window.currentFileIndex = 0;
+                        {% endif %}
+                        // Initialize progress display
+                        updateProgress();
                     </script>
                 {% endif %}
+
             </div>
 
             <!--vtk container on right-->

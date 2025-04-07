@@ -1,6 +1,18 @@
 // 4/3/2025 Elizabeth Li
 // visualize .vtp brain structure files with vtk, process user-inputted rating
 
+// Helper function to update the progress display
+function updateProgress(){
+    // Total files is the length of the filenames array
+    const total = window.filenames ? window.filenames.length : 1;
+    // Number of rated files equals the current index
+    const rated = window.currentFileIndex;
+    const progressElement = document.getElementById('progress');
+    if (progressElement) {
+        progressElement.innerText = "(" + rated + " / " + total + " rated)";
+    }
+}
+
 function initializeVTK(filename){
     const container = document.getElementById('vtk-container');
 
@@ -105,8 +117,6 @@ function initializeVTK(filename){
         .catch(error => console.error('Error loading VTP file:', error));
 }
 
-
-
 // Check if a file has been uploaded and initialize visualization
 document.addEventListener('DOMContentLoaded', () => {
     const fileInput = document.getElementById('fileInput');
@@ -120,10 +130,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-
-
-// Submit a user-inputted rating for a given file to the server
-// Now accepts both filename and rating as arguments
 function submitRating(filename, rating){
     fetch('/rate', {
         method: 'POST',
@@ -137,30 +143,34 @@ function submitRating(filename, rating){
         if (notification) {
             notification.innerText = 'Rating submitted successfully';
             notification.style.display = 'block';
-            
-            // Hide notification after 0.5 seconds
+            // Hide the notification after 2 seconds
             setTimeout(() => {
                 notification.style.display = 'none';
-            }, 500);
+            }, 2000);
         }
         console.log(data);
         
-        // After a rating is submitted, if a folder was uploaded, advance to the next file.
+        // After a rating is submitted, if there are more files, advance to the next one.
         if (window.filenames && window.currentFileIndex < window.filenames.length - 1) {
             window.currentFileIndex++;
             window.filename = window.filenames[window.currentFileIndex];
             
-            // Dynamically update the displayed filename on the webpage
+            // Update the displayed filename
             const filenameElement = document.getElementById('uploadedFilename');
             if (filenameElement) {
-                filenameElement.innerText = "Uploaded file: " + window.filename;
+                filenameElement.innerHTML = "Uploaded file: " + window.filename + "<br><span id='progress' style='font-size: 14px; color: white; font-weight: normal;'></span>";
             }
+
+            // Update progress display
+            updateProgress();
 
             // Clear the VTK container and reinitialize with the next file.
             const container = document.getElementById('vtk-container');
             container.innerHTML = "";  // Clear the container
             initializeVTK(window.filename);
         } else {
+            // Update progress display for the final file before alerting.
+            updateProgress();
             // Pop up an alert when all files have been rated
             alert("All files have been rated.");
         }
@@ -168,12 +178,10 @@ function submitRating(filename, rating){
     .catch(error => console.error('Error submitting rating:', error));
 }
 
-
-
 // Listen for key presses (1, 2, 3) for primary rating submission
 document.addEventListener('keydown', function(event) {
     if (!window.filename) return;
     if (event.key === '1' || event.key === '2' || event.key === '3') {
-    submitRating(window.filename, parseInt(event.key));
+        submitRating(window.filename, parseInt(event.key));
     }
 });
