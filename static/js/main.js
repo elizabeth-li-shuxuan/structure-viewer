@@ -3,13 +3,11 @@
 
 // Helper function to update the progress display
 function updateProgress(){
-    // Total files is the length of the filenames array
-    const total = window.filenames ? window.filenames.length : 1;
-    // Number of rated files equals the current index
-    const rated = window.currentFileIndex;
-    const progressElement = document.getElementById('progress');
+    const total = window.totalFiles;
+    const rated = window.alreadyRatedCount + window.currentFileIndex;
+    const progressElement = document.getElementById('progress-text');
     if (progressElement) {
-        progressElement.innerText = "(" + rated + " / " + total + " rated)";
+        progressElement.innerText = `(${rated} / ${total} rated)`;
     }
 }
 
@@ -77,7 +75,7 @@ function initializeVTK(filename){
                 position[1] - focalPoint[1],
                 position[2] - focalPoint[2]
             ];
-            const factor = 4.75; // Increase distance by 50%
+            const factor = 7; // Increase distance of camera from object
             camera.setPosition(
                 focalPoint[0] + vector[0] * factor,
                 focalPoint[1] + vector[1] * factor,
@@ -143,10 +141,10 @@ function submitRating(filename, rating){
         if (notification) {
             notification.innerText = 'Rating submitted successfully';
             notification.style.display = 'block';
-            // Hide the notification after 2 seconds
+            // Hide the notification after some time
             setTimeout(() => {
                 notification.style.display = 'none';
-            }, 2000);
+            }, 500);
         }
         console.log(data);
         
@@ -206,6 +204,16 @@ function goBack(){
             const container = document.getElementById('vtk-container');
             container.innerHTML = "";
             initializeVTK(window.filename);
+
+            // inline notification
+            const notification = document.getElementById('notification');
+            if (notification) {
+                notification.innerText = 'Returned to previous file';
+                notification.style.display = 'block';
+                setTimeout(() => {
+                    notification.style.display = 'none';
+                }, 500);
+            }
         })
         .catch(error => console.error('Error deleting rating:', error));
 

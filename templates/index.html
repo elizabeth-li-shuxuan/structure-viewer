@@ -51,7 +51,7 @@
         <div class="main-container">
             <!--text section on top left-->
             <div class="text-section">
-                <div> Upload a brain file (.vtp)</div>
+                <div> Upload a folder of multiple .vtp files</div>
 
                 <form method="post" enctype="multipart/form-data">
                     <!-- Allow users to select folders or multiple files at once -->
@@ -60,7 +60,9 @@
 
                 <!--if a file has been uploaded, display the file name and rating options-->
                 {% if filename %}
-                    <h2 id="uploadedFilename">Uploaded file: {{ filename }}</h2>             
+                    <h2 id="uploadedFilename">Uploaded file: {{ filename }}</h2>
+                    
+                    <div id="progress-text" style="margin-top:20px;">({{ rated_count }} / {{ total_files }} rated)</div>
                     
                     <div style="margin-top:20px;">
                         <p>Please rate:</p>
@@ -86,9 +88,13 @@
                         {% endif %}
                         // Initialize progress display
                         updateProgress();
+
+                         // Pass total file count and already-rated count to the client
+                        window.totalFiles = {{ total_files }};
+                        window.alreadyRatedCount = {{ rated_count }};
+                        updateProgress();
                     </script>
                 {% endif %}
-
             </div>
 
             <!--vtk container on right-->
@@ -99,14 +105,15 @@
             </div>
         </div>
         
-        <!-- if multiple files, output the variables -->
-        {% if filenames %}
+        <!-- Initialize client-side variables using Jinja templating -->
         <script>
-            window.filenames = {{ filenames|tojson|safe }}; // ignore the warning; this is a Jinja template
+            window.totalFiles = {{ total_files }};
+            window.alreadyRatedCount = {{ rated_count }};
+            window.filenames = {{ filenames|tojson|safe }};
             window.currentFileIndex = 0;
-            window.filename = window.filenames[0];
+            window.filename = window.filenames.length ? window.filenames[0] : null;
+            updateProgress();
         </script>
-        {% endif %}
 
         <!--link main.js that handles client-side functionality-->
         <script src="{{url_for('static', filename='js/main.js')}}"></script>
