@@ -92,7 +92,7 @@ def rate_file():
             writer.writeheader()
         writer.writerow(entry)
     
-    print(f"Rating received: {filename} rated {rating}")
+#    print(f"Rating received: {filename} rated {rating}")
     return jsonify(status="success")
 
 

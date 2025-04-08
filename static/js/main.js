@@ -75,7 +75,7 @@ function initializeVTK(filename){
                 position[1] - focalPoint[1],
                 position[2] - focalPoint[2]
             ];
-            const factor = 7; // Increase distance of camera from object
+            const factor = 7; // Increase distance of camera from object by 700%
             camera.setPosition(
                 focalPoint[0] + vector[0] * factor,
                 focalPoint[1] + vector[1] * factor,
@@ -102,8 +102,8 @@ function initializeVTK(filename){
                 // Calculate offset from center
                 const offsetX = mouseX - centerX;
                 const offsetY = mouseY - centerY;
-                // Sensitivity factor: adjust for desired rotation effect
-                const sensitivity = 0.5;
+                // Sensitivity
+                const sensitivity = 0.75;
                 // Determine rotation angles: vertical movement rotates about X-axis, horizontal about Y-axis
                 const rotationX = offsetY * sensitivity;
                 const rotationY = offsetX * sensitivity;
