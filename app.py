@@ -8,10 +8,21 @@ from werkzeug.utils import secure_filename
 from datetime import datetime
 import shutil
 import random
+import atexit
 
 app = Flask(__name__)
 UPLOAD_FOLDER = 'uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+#ensure that the uploads folder exists on startup
+if not os.path.exists(app.config['UPLOAD_FOLDER']):
+    os.makedirs(app.config['UPLOAD_FOLDER'])
+
+#clear uploads folder when exiting (with Ctrl + C)
+@atexit.register
+def cleanup_upload_folder():
+    shutil.rmtree(app.config['UPLOAD_FOLDER'], ignore_errors=True)
+    print("Uploads folder cleaned up on shutdown.")
 
 #list all .vtp files in uploads folder
 def get_all_files():
@@ -31,11 +42,6 @@ def get_rated_filenames():
 
 @app.route('/', methods=['GET', 'POST'])
 def upload_file():
-    # Clear uploads folder for a fresh start each visit
-    if request.method == 'GET':
-        shutil.rmtree(app.config['UPLOAD_FOLDER'], ignore_errors=True)
-        os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-
     if request.method == 'POST':
         if 'file' not in request.files:
             return 'No file part', 400
